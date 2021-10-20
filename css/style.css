@@ -1,0 +1,22 @@
+#board {
+	border: 0.2rem solid #000;
+	width: min-content;
+}
+
+#board > div {
+	display: flex;
+}
+
+#board > div > div {
+	width: 2rem;
+	height: 2rem;
+}
+
+#board > div:nth-child(2n) > div:nth-child(2n+1),
+#board > div:nth-child(2n+1) > div:nth-child(2n) {
+	background-color: #000;
+}
+
+#board > div > div.highlighted {
+	background-color: red !important;
+}
