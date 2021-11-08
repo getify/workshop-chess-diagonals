@@ -6,15 +6,58 @@ export default {
 
 // ****************************
 
+var origBoardEl;
+
 function draw(boardEl) {
-	// TODO: draw the chessboard, 8 rows (divs)
-	// of 8 tiles (divs) each, inserting all DOM
-	// elements into `boardEl` div
+	origBoardEl = boardEl;
+
+	for (let i = 0; i <= 7; i++) {
+		let rowEl = document.createElement("div");
+		for (let j = 0; j <= 7; j++) {
+			let tileEl = document.createElement("div");
+			rowEl.appendChild(tileEl);
+		}
+		boardEl.appendChild(rowEl);
+	}
 }
 
 function highlight(tileEl) {
-	// TODO: clear previous highlights (if any) and
-	// then find the tiles in the two diagonals
-	// (major and minor) that `tileEl` belongs to,
-	// to highlight them via CSS class "highlighted"
+	var tiles = origBoardEl.querySelectorAll("div > div");
+
+	// clear all currently highlighted tiles (if any)
+	for (let el of tiles) {
+		el.classList.remove("highlighted");
+	}
+
+	// clicked on a board tile?
+	if (tileEl) {
+		let rowEl = tileEl.parentNode;
+		let tileRowIdx = [...origBoardEl.childNodes].findIndex(el => el == rowEl);
+		let tileColIdx = [...rowEl.childNodes].findIndex(el => el == tileEl);
+
+		// highlight in up-left direction
+		for (let i = tileRowIdx, j = tileColIdx; i >= 0 && j >= 0; i--, j--) {
+			let el = findTile(i,j);
+			el.classList.add("highlighted");
+		}
+		// highlight in the up-right direction
+		for (let i = tileRowIdx, j = tileColIdx; i >= 0 && j <= 7; i--, j++) {
+			let el = findTile(i,j);
+			el.classList.add("highlighted");
+		}
+		// highlight in down-left direction
+		for (let i = tileRowIdx, j = tileColIdx; i <= 7 && j >= 0; i++, j--) {
+			let el = findTile(i,j);
+			el.classList.add("highlighted");
+		}
+		// highlight in the down-right direction
+		for (let i = tileRowIdx, j = tileColIdx; i <= 7 && j <= 7; i++, j++) {
+			let el = findTile(i,j);
+			el.classList.add("highlighted");
+		}
+	}
+}
+
+function findTile(row,col) {
+	return document.querySelector(`#board > div:nth-child(${ row + 1 }) > div:nth-child(${ col + 1 })`);
 }
