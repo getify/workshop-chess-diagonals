@@ -6,24 +6,23 @@ export default {
 
 // ****************************
 
-var origBoardEl;
+var tiles;
 
 function draw(boardEl) {
-	origBoardEl = boardEl;
-
 	for (let i = 0; i <= 7; i++) {
 		let rowEl = document.createElement("div");
 		for (let j = 0; j <= 7; j++) {
 			let tileEl = document.createElement("div");
+			tileEl.dataset.row = i;
+			tileEl.dataset.col = j;
 			rowEl.appendChild(tileEl);
 		}
 		boardEl.appendChild(rowEl);
 	}
+	tiles = boardEl.querySelectorAll("div > div");
 }
 
 function highlight(tileEl) {
-	var tiles = origBoardEl.querySelectorAll("div > div");
-
 	// clear all currently highlighted tiles (if any)
 	for (let el of tiles) {
 		el.classList.remove("highlighted");
@@ -32,7 +31,8 @@ function highlight(tileEl) {
 	// clicked on a board tile?
 	if (tileEl) {
 		let rowEl = tileEl.parentNode;
-		let tileRowIdx = [...origBoardEl.childNodes].findIndex(el => el == rowEl);
+		let boardEl = rowEl.parentNode;
+		let tileRowIdx = [...boardEl.childNodes].findIndex(el => el == rowEl);
 		let tileColIdx = [...rowEl.childNodes].findIndex(el => el == tileEl);
 
 		// highlight in up-left direction
@@ -59,5 +59,9 @@ function highlight(tileEl) {
 }
 
 function findTile(row,col) {
-	return document.querySelector(`#board > div:nth-child(${ row + 1 }) > div:nth-child(${ col + 1 })`);
+	for (let el of tiles) {
+		if (el.dataset.row == row && el.dataset.col == col) {
+			return el;
+		}
+	}
 }
