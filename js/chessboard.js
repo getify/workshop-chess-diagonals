@@ -6,19 +6,40 @@ export default {
 
 // ****************************
 
-var tiles = [];
+var diagonals = [];
+var highlighted = [];
+var tileDiagonals = new Map();
 
 function draw(boardEl) {
+	// setup all 15 top-left-bottom-right (major) diagonal
+	// collections and all 15 top-right-bottom-left (minor)
+	// diagonal collections
+	for (let i = 0; i < 30; i++) {
+		diagonals.push([]);
+	}
+
 	for (let i = 0; i <= 7; i++) {
 		let rowEl = document.createElement("div");
-		let rowTiles = [];
-		tiles.push(rowTiles);
 		for (let j = 0; j <= 7; j++) {
 			let tileEl = document.createElement("div");
-			tileEl.dataset.row = i;
-			tileEl.dataset.col = j;
+
+			// select the top-left-bottom-right (major)
+			// diagonal collection
+			let majorDiag = diagonals[7 - (i - j)];
+			// select the top-right-bottom-left (minor)
+			// diagonal collection
+			let minorDiag = diagonals[15 + (i + j)];
+
+			// save a reference to this tile in each of its
+			// two diagonals collections
+			majorDiag.push(tileEl);
+			minorDiag.push(tileEl);
+
+			// save a reference to each of a tile's two diagonal
+			// collections
+			tileDiagonals.set(tileEl,[ majorDiag, minorDiag ]);
+
 			rowEl.appendChild(tileEl);
-			rowTiles.push(tileEl);
 		}
 		boardEl.appendChild(rowEl);
 	}
@@ -26,40 +47,23 @@ function draw(boardEl) {
 
 function highlight(tileEl) {
 	// clear all currently highlighted tiles (if any)
-	for (let row of tiles) {
-		for (let el of row) {
+	for (let diagonal of highlighted) {
+		for (let el of diagonal) {
 			el.classList.remove("highlighted");
 		}
 	}
+	highlighted = [];
 
 	// clicked on a board tile?
 	if (tileEl) {
-		let tileRowIdx = tileEl.dataset.row;
-		let tileColIdx = tileEl.dataset.col;
+		// retrieve the clicked tile's two diagonal collections
+		highlighted = tileDiagonals.get(tileEl);
 
-		// highlight in up-left direction
-		for (let i = tileRowIdx, j = tileColIdx; i >= 0 && j >= 0; i--, j--) {
-			let el = findTile(i,j);
-			el.classList.add("highlighted");
-		}
-		// highlight in the up-right direction
-		for (let i = tileRowIdx, j = tileColIdx; i >= 0 && j <= 7; i--, j++) {
-			let el = findTile(i,j);
-			el.classList.add("highlighted");
-		}
-		// highlight in down-left direction
-		for (let i = tileRowIdx, j = tileColIdx; i <= 7 && j >= 0; i++, j--) {
-			let el = findTile(i,j);
-			el.classList.add("highlighted");
-		}
-		// highlight in the down-right direction
-		for (let i = tileRowIdx, j = tileColIdx; i <= 7 && j <= 7; i++, j++) {
-			let el = findTile(i,j);
-			el.classList.add("highlighted");
+		// highlight all tiles in both diagonal collections
+		for (let diagonal of highlighted) {
+			for (let el of diagonal) {
+				el.classList.add("highlighted");
+			}
 		}
 	}
-}
-
-function findTile(row,col) {
-	return tiles[row][col];
 }
